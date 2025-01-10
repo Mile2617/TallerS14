@@ -1,3 +1,6 @@
+#ifndef FUNCIONES_H
+#define FUNCIONES_H
+
 struct Producto
 {
     char nombre[50];
@@ -18,7 +21,6 @@ struct Factura
     struct Producto *productos;
 };
 
-
 int menu();
 void leerCadena(char *cadena, int num);
 int leerEnteroPositivo(const char *mensaje);
@@ -34,3 +36,4 @@ void editarFactura();
 void eliminarFactura();
 void reporteResumen();
 
+#endif // FUNCIONES_H
