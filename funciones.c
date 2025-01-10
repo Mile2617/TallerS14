@@ -77,7 +77,7 @@ void calcularTotalFactura(struct Factura *factura, float impuesto, float descuen
     factura->descuentos = descuentos;
 }
 
-void imprimirFacturaPorNumero()
+void imprimirFactura()
 {
     FILE *file = fopen("factura.dat", "rb");
     if (file == NULL)
