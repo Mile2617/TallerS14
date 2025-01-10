@@ -18,6 +18,7 @@ struct Factura
     struct Producto *productos;
 };
 
+
 int menu();
 void leerCadena(char *cadena, int num);
 int leerEnteroPositivo(const char *mensaje);
