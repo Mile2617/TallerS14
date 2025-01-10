@@ -77,25 +77,41 @@ void calcularTotalFactura(struct Factura *factura, float impuesto, float descuen
     factura->descuentos = descuentos;
 }
 
-void imprimirFactura(struct Factura *factura)
+void imprimirFacturaPorNumero()
 {
-    printf("\n------------------------------------\n");
-    printf("             FACTURA #%d\n", factura->numeroFactura);
-    printf("------------------------------------\n");
-    printf("Cliente: %-20s Cedula: %-10d\n", factura->nombre, factura->cedula);
-    printf("------------------------------------\n");
-    printf("%-15s %-10s %-15s %-10s\n", "Producto", "Cantidad", "Precio Unitario", "Monto");
-    for (int i = 0; i < factura->numProductos; i++)
+    FILE *file = fopen("factura.dat", "rb");
+    if (file == NULL)
     {
-        float monto = factura->productos[i].cantidad * factura->productos[i].precio;
-        printf("%-15s %-10d %-15.2f %-10.2f\n", factura->productos[i].nombre, factura->productos[i].cantidad, factura->productos[i].precio, monto);
+        printf("Error al abrir el archivo\n");
+        return;
     }
-    printf("------------------------------------\n");
-    printf("Subtotal: %.2f\n", factura->subtotal);
-    printf("Impuestos: %.2f\n", factura->impuestos);
-    printf("Descuentos: %.2f\n", factura->descuentos);
-    printf("Total: %.2f\n", factura->total);
-    printf("------------------------------------\n\n");
+
+    int numeroFactura = leerEnteroPositivo("Ingrese el numero de factura a imprimir: ");
+    struct Factura factura;
+    int encontrado = 0;
+
+    while (fread(&factura, sizeof(struct Factura), 1, file))
+    {
+        factura.productos = (struct Producto *)malloc(factura.numProductos * sizeof(struct Producto));
+        fread(factura.productos, sizeof(struct Producto), factura.numProductos, file);
+
+        if (factura.numeroFactura == numeroFactura)
+        {
+            imprimirFactura(&factura);
+            encontrado = 1;
+            free(factura.productos);
+            break;
+        }
+
+        free(factura.productos);
+    }
+
+    if (!encontrado)
+    {
+        printf("No se encontro la factura con el numero proporcionado.\n");
+    }
+
+    fclose(file);
 }
 
 void saveFactura(struct Factura *factura)
@@ -314,7 +330,7 @@ void editarFactura()
                     break;
             }
 
-            calcularTotalFactura(&factura, 0, 0); // Recalcula el total
+            calcularTotalFactura(&factura, 0, 0);
             fseek(file, -((long)sizeof(struct Factura) + (factura.numProductos * sizeof(struct Producto))), SEEK_CUR);
             fwrite(&factura, sizeof(struct Factura), 1, file);
             fwrite(factura.productos, sizeof(struct Producto), factura.numProductos, file);
